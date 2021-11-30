@@ -3,6 +3,7 @@ import rospy
 import cv2
 import apriltag
 from sensor_msgs.msg import Image
+from std_msgs.msg import String
 from cv_bridge import CvBridge
 
 tags_found = []
@@ -29,16 +30,24 @@ def tag_found(id):
     tags_found.append(id)
     rospy.loginfo("Tag %s found", id)
     rospy.loginfo("%s tag(s) collected: %s", len(tags_found), tags_found)
-    
+
+def publish_tags(pub):
+    out_msg = "{} tag(s) found: {}".format(len(tags_found), tags_found)
+    pub.publish(out_msg)
         
 def main():
     rospy.init_node('apriltag_reader')
     frequency = rospy.get_param('frequency')
     rate = rospy.Rate(frequency)
     img_topic = rospy.get_param('img_topic')
+    pub = rospy.Publisher('/apriltags', String, queue_size = 1)
+    count = 0
     while not rospy.is_shutdown():
         read_tags(img_topic)
         rate.sleep()
+        if len(tags_found) > count:
+            publish_tags(pub)
+            count+=1
     rospy.spin()
 
 if __name__ == '__main__':
