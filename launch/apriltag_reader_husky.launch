@@ -1,0 +1,7 @@
+<launch>
+	<node pkg="apriltag_reader" name="apriltag_reader" type="apriltag_reader.py" output="screen"/>
+
+	<param name="frequency" value="1" type="double"/>
+
+	<param name="img_topic" value="/realsense/color/image_raw" type="string"/>
+</launch>
